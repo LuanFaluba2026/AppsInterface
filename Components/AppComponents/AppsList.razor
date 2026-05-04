@@ -1,0 +1,79 @@
+﻿@rendermode InteractiveServer
+<div class="applist">
+
+    <div class="search-area">
+        Pesquisar: <input type="text" @bind="searchTerm" @bind:event="oninput" placeholder="Search apps..." class="search-input" />
+        Filtrar: 
+        <select @bind="selectedFilterType" class="filter-select">
+            <option value="">All Types</option>
+            @foreach (var type in Enum.GetValues<AppType>())
+            {
+                <option value="@type">@type</option>
+            }
+        </select>
+    </div>
+    <div class="appslist-container">
+        @if(apps.Count == 0)
+        {
+            <p style="width: 100%; text-align: center; align-self: center; font-size: 1.2em; color: #666;">
+                No apps found.
+            </p>
+        }
+        else
+        {
+            @foreach (var app in apps)
+            {
+                <div class="app-container">
+                    <img src="/Icons/Placeholders/Sem título.jpg" alt="@app.Name">
+                    <h3>@app.Name</h3>
+                    <h5>@app.Type</h5>
+                    <p>@app.Description</p>
+                </div>
+            }
+        }
+    </div>
+</div>
+@code {
+    List<PublishedApp> apps = AppsController.GetAvailableApps();
+
+    private string? _searchTerm;
+    string? searchTerm
+    {
+        get => _searchTerm;
+        set
+        {
+            _searchTerm = value;
+            SearchApps();
+        }
+    }
+    private AppType? _selectedFilterType;
+    AppType? selectedFilterType
+    {
+        get => _selectedFilterType;
+        set
+        {
+            _selectedFilterType = value;
+            searchAppsByType();
+        }
+    }
+    void SearchApps()
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+            apps = AppsController.GetAvailableApps();
+        else
+            apps = AppsController.GetAvailableApps()
+                .Where(app =>
+                    app.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    app.Description.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+    }
+    void searchAppsByType()
+    {
+        if (selectedFilterType == null)
+            apps = AppsController.GetAvailableApps();
+        else
+            apps = AppsController.GetAvailableApps()
+                .Where(app => app.Type == selectedFilterType)
+                .ToList();
+    }
+}
