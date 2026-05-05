@@ -3,16 +3,9 @@
     min-height: 100vh;
 }
 
-.sidebar[b-7gihzjqra8] {
-    width: 260px;
-    color: white;
-    padding: 1rem;
-    border-right: 3px solid #666;
-}
-
 .content[b-7gihzjqra8] {
     flex: 1;
-    padding: 2rem;
+    padding: 0.5rem;
     background: #f8f9fa;
     overflow-y: auto;
 }

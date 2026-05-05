@@ -1,10 +1,15 @@
 ﻿@page "/apps"
+@page "/apps/{AppId:guid}"
 
-<PageTitle>Aplicativos Disponiveis</PageTitle>
+<AppsList />
+@if (AppId.HasValue)
+{
+    <div class="mt-2">
+        <AppDisplay AppId="AppId.Value" />
+    </div>
+}
 
-<div class="apps-list">
-    <AppsList/>
-</div>
-<div class="app-display">
-    <AppDisplay/>
-</div>
+@code {
+    [Parameter]
+    public Guid? AppId { get; set; }
+}

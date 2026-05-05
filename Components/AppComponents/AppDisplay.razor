@@ -1,5 +1,120 @@
-﻿<h3>AppDisplay</h3>
+﻿@using AppsInterface.Components.Models.Enum.Ticket
+@rendermode InteractiveServer
+@inject NavigationManager nav
+@if(selectedApp != null)
+{
+    <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+        <div class="card-header bg-primary text-white p-4">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                <div>
+                    <h2 class="fw-bold d-inline mb-3">@selectedApp.Name</h2>
+                    <p class="opacity-50 d-inline ms-2">@selectedApp.Id</p>
+                    <p class="mb-0 mt-2 opacity-75">
+                        @selectedApp.Description
+                    </p>
+                </div>
 
+                <span class="badge bg-light text-primary fs-6 px-3 py-2">
+                    @selectedApp.Type
+                </span>
+            </div>
+        </div>
+
+        <div class="card-body p-4">
+
+            <div class="row g-5">
+
+                <div class="col-lg-8">
+                    <div class="card border-0 bg-light rounded-4 h-100">
+                        <div class="card-body">
+                            <h4 class="fw-semibold mb-3">Downloads</h4>
+
+                            <table class="table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Arquivo</th>
+                                        <th>Tamanho</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>ConversorDES.rar</td>
+                                        <td>10 MB</td>
+                                        <td class="text-end">
+                                            <a href="" class="btn btn-primary btn-sm">
+                                                Baixar
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card border-0 bg-light rounded-4">
+                        <div class="card-body">
+                            <h4 class="fw-semibold mb-3">Documentação</h4>
+
+                            <div class="d-grid gap-2">
+                                <a href="@AppId/Manual" class="btn btn-outline-primary">
+                                    Modo de Uso
+                                </a>
+                                <a href="@AppId/Fluxograma" class="btn btn-outline-secondary">
+                                    Fluxograma
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <h4 class="fw-semibold mb-3">Tickets Abertos</h4>
+                        <button class="btn btn-primary">Abrir ticket</button>
+                </div>
+                <table class="table table-fixed table-striped table-hover mt-1" style="table-layout: fixed;">
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">Índice</th>
+                            <th style="width: 70%;">Descrição</th>
+                            <th class="text-center" style="width: 20%;">Prioridade</th>
+                            <th style="width: 20%;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="cursor-pointer">
+                        @for(int i = 0; i < appTickets.Count; i++)
+                        {
+                            var ticket = appTickets[i];
+                            <tr @onclick='() => nav.NavigateTo($"/tickets/{ticket.TicketId}")'>
+                                <td>@(i + 1)</td>
+                                <td>@ticket.Title</td>
+                                <td class="text-center align-middle">
+                                    <span class="@(ticket.Priority == TicketPriority.Alta ? "bg-danger text-white" : ticket.Priority == TicketPriority.Media ? "bg-warning text-dark" : "bg-success text-white") p-1 px-4 rounded-pill">
+                                        @ticket.Priority
+                                    </span>
+                                </td>                                
+                                <td class="@(ticket.Status == TicketStatus.Aberto ? "text-warning" : "text-success")">@ticket.Status</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
 @code {
+    [Parameter]
+    public Guid? AppId { get; set; }
+    private PublishedApp? selectedApp;
+    private List<Ticket> appTickets = new List<Ticket>();
 
+    protected override void OnParametersSet()
+    {
+        selectedApp = AppId.HasValue
+            ? AppsController.GetAppById(AppId.Value)
+            : null;
+        appTickets = TicketsController.GetTicketsByAppId(selectedApp?.Id ?? Guid.Empty).OrderBy(x => (int)x.Priority).ToList();
+    }
 }

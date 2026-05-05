@@ -1,3 +1,5 @@
+using AppsInterface.Components.Models.Enum;
+
 namespace AppsInterface.Components.Models;
 public class PublishedApp
 {
@@ -7,4 +9,5 @@ public class PublishedApp
     public string? IconPath { get; set; }
     public required string DownloadPath { get; set; }
     public AppType Type { get; set; }
+    public Ticket? AppTickets { get; set; }
 }

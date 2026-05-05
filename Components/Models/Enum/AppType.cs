@@ -1,4 +1,4 @@
-namespace AppsInterface.Components.Models;
+namespace AppsInterface.Components.Models.Enum;
 public enum AppType
 {
     Automatizador,

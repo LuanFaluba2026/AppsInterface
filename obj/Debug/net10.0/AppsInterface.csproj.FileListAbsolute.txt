@@ -35,9 +35,7 @@ C:\Users\luan\Documents\Desenvolvimento Aplicativos\2 - Desenvolvimento Web\Apps
 C:\Users\luan\Documents\Desenvolvimento Aplicativos\2 - Desenvolvimento Web\AppsInterface\obj\Debug\net10.0\AppsInterface.pdb
 C:\Users\luan\Documents\Desenvolvimento Aplicativos\2 - Desenvolvimento Web\AppsInterface\obj\Debug\net10.0\AppsInterface.genruntimeconfig.cache
 C:\Users\luan\Documents\Desenvolvimento Aplicativos\2 - Desenvolvimento Web\AppsInterface\obj\Debug\net10.0\ref\AppsInterface.dll
-C:\Users\luan\Documents\Desenvolvimento Aplicativos\2 - Desenvolvimento Web\AppsInterface\obj\Debug\net10.0\scopedcss\Components\AppComponents\AppsList.razor.rz.scp.css
-C:\Users\luan\Documents\Desenvolvimento Aplicativos\2 - Desenvolvimento Web\AppsInterface\obj\Debug\net10.0\scopedcss\Components\AppComponents\AppDisplay.razor.rz.scp.css
-C:\Users\luan\Documents\Desenvolvimento Aplicativos\2 - Desenvolvimento Web\AppsInterface\obj\Debug\net10.0\scopedcss\Components\Layout\NavMenu.razor.rz.scp.css
-C:\Users\luan\Documents\Desenvolvimento Aplicativos\2 - Desenvolvimento Web\AppsInterface\obj\Debug\net10.0\compressed\w8xvcrcx7u-{0}-xyqy7ohpol-xyqy7ohpol.gz
-C:\Users\luan\Documents\Desenvolvimento Aplicativos\2 - Desenvolvimento Web\AppsInterface\obj\Debug\net10.0\compressed\2hg5w38iwz-{0}-s6e32ydvnd-s6e32ydvnd.gz
-C:\Users\luan\Documents\Desenvolvimento Aplicativos\2 - Desenvolvimento Web\AppsInterface\obj\Debug\net10.0\compressed\hspdk9oa3d-{0}-s6e32ydvnd-s6e32ydvnd.gz
+C:\Users\luan\Documents\Desenvolvimento Aplicativos\2 - Desenvolvimento Web\AppsInterface\obj\Debug\net10.0\AppsInterface.sourcelink.json
+C:\Users\luan\Documents\Desenvolvimento Aplicativos\2 - Desenvolvimento Web\AppsInterface\obj\Debug\net10.0\compressed\w8xvcrcx7u-{0}-pj1wkeqzgi-pj1wkeqzgi.gz
+C:\Users\luan\Documents\Desenvolvimento Aplicativos\2 - Desenvolvimento Web\AppsInterface\obj\Debug\net10.0\compressed\2hg5w38iwz-{0}-t455hf47wd-t455hf47wd.gz
+C:\Users\luan\Documents\Desenvolvimento Aplicativos\2 - Desenvolvimento Web\AppsInterface\obj\Debug\net10.0\compressed\hspdk9oa3d-{0}-t455hf47wd-t455hf47wd.gz
