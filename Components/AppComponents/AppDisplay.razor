@@ -7,9 +7,9 @@
         <div class="card-header bg-primary text-white p-4">
             <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
                 <div>
-                    <h2 class="fw-bold d-inline mb-3">@selectedApp.Name</h2>
+                    <h2 class="fw-bold mb-3 d-inline">@selectedApp.Name</h2>
                     <p class="opacity-50 d-inline ms-2">@selectedApp.Id</p>
-                    <p class="mb-0 mt-2 opacity-75">
+                    <p class="mb-0 mt-2 opacity-75" style="max-width: 1000px;">
                         @selectedApp.Description
                     </p>
                 </div>
@@ -29,7 +29,7 @@
                         <div class="card-body">
                             <h4 class="fw-semibold mb-3">Downloads</h4>
 
-                            <table class="table table-hover align-middle mb-0">
+                            <table class="table table-hover align-middle mb-0" style="table-layout: fixed;">
                                 <thead>
                                     <tr>
                                         <th>Arquivo</th>
@@ -39,10 +39,10 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>ConversorDES.rar</td>
-                                        <td>10 MB</td>
+                                        <td>@Path.GetFileName(selectedApp.DownloadPath)</td>
+                                        <td>@((new FileInfo(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", selectedApp.DownloadPath)).Length / 1024.0 / 1024.0).ToString("F2")) MB</td>
                                         <td class="text-end">
-                                            <a href="" class="btn btn-primary btn-sm">
+                                            <a href="@selectedApp.DownloadPath" download="" class="btn btn-primary btn-sm">
                                                 Baixar
                                             </a>
                                         </td>

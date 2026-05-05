@@ -11,140 +11,18 @@ namespace AppsInterface.Components.Controllers;
     {
         new()
         {
-            Id = Guid.Parse("e4ac7258-eabf-4902-ac0d-c77d1c3393ff"),
             Name = "Conversor DES",
-            Description = "Um app que ajuda na escrituração da DES de Belo Horizonte",
-            DownloadPath = "//",
+            Description = "Aplicativo que automatiza processos de escrituração da DES de Belo Horizonte, possibilitando o registro de notas fiscais do Portal Nacional e de São Paulo.",
+            DownloadPath = "DownloadApps/Conversor DES.rar",
             Type = AppType.Fiscal
         },
         new()
         {
-            Id = Guid.Parse("730530f5-64c4-400b-9192-e20b40c81226"),
-            Name = "Ordenador PDF",
-            Description = "Um app que deixa você organizar seus PDFS de acordo com alguns campos",
-            DownloadPath = "//",
-            Type = AppType.Automatizador
+            Name = "Conciliador Contábil",
+            Description = "Aplicativo de automação que analisa o razão contábil e gera uma planilha completa de conciliação, agilizando a conferência, identificação de inconsistências e validação das informações contábeis.",
+            DownloadPath = "DownloadApps/Conciliador Contábil.rar",
+            Type = AppType.Contabil
         },
-        new()
-        {
-            Id = Guid.Parse("741d6cb6-2b2a-42da-a417-42df1ec3b45d"),
-            Name = "Cemig Converter",
-            Description = "Um app que lê os QR codes das notas da CEMIG e criam um arquivo importador do Domínio.",
-            DownloadPath = "//",
-            Type = AppType.Fiscal
-        },
-        new()
-        {
-            Name = "Planilha Portal Nacional",
-            Description = "Um appp doiiidimais doiiido",
-            DownloadPath = "//",
-            Type = AppType.Automatizador
-        },
-        new()
-        {
-            Name = "Planilha Portal Nacional",
-            Description = "Um appp doiiidimais doiiido",
-            DownloadPath = "//",
-            Type = AppType.Automatizador
-        },
-        new()
-        {
-            Name = "Planilha Portal Nacional",
-            Description = "Um appp doiiidimais doiiido",
-            DownloadPath = "//",
-            Type = AppType.Automatizador
-        },
-        new()
-        {
-            Name = "Planilha Portal Nacional",
-            Description = "Um appp doiiidimais doiiido",
-            DownloadPath = "//",
-            Type = AppType.Automatizador
-        },
-        new()
-        {
-            Name = "Planilha Portal Nacional",
-            Description = "Um appp doiiidimais doiiido",
-            DownloadPath = "//",
-            Type = AppType.Automatizador
-        },
-        new()
-        {
-            Name = "Planilha Portal Nacional",
-            Description = "Um appp doiiidimais doiiido",
-            DownloadPath = "//",
-            Type = AppType.Automatizador
-        },
-        new()
-        {
-            Name = "Planilha Portal Nacional",
-            Description = "Um appp doiiidimais doiiido",
-            DownloadPath = "//",
-            Type = AppType.Automatizador
-        },
-        new()
-        {
-            Name = "Planilha Portal Nacional",
-            Description = "Um appp doiiidimais doiiido",
-            DownloadPath = "//",
-            Type = AppType.Automatizador
-        },
-        new()
-        {
-            Name = "Planilha Portal Nacional",
-            Description = "Um appp doiiidimais doiiido",
-            DownloadPath = "//",
-            Type = AppType.Automatizador
-        },
-        new()
-        {
-            Name = "Planilha Portal Nacional",
-            Description = "Um appp doiiidimais doiiido",
-            DownloadPath = "//",
-            Type = AppType.Automatizador
-        },
-        new()
-        {
-            Name = "Planilha Portal Nacional",
-            Description = "Um appp doiiidimais doiiido",
-            DownloadPath = "//",
-            Type = AppType.Automatizador
-        },
-        new()
-        {
-            Name = "Planilha Portal Nacional",
-            Description = "Um appp doiiidimais doiiido",
-            DownloadPath = "//",
-            Type = AppType.Automatizador
-        },
-        new()
-        {
-            Name = "Planilha Portal Nacional",
-            Description = "Um appp doiiidimais doiiido",
-            DownloadPath = "//",
-            Type = AppType.Automatizador
-        },
-        new()
-        {
-            Name = "Planilha Portal Nacional",
-            Description = "Um appp doiiidimais doiiido",
-            DownloadPath = "//",
-            Type = AppType.Automatizador
-        },
-        new()
-        {
-            Name = "Planilha Portal Nacional",
-            Description = "Um appp doiiidimais doiiido",
-            DownloadPath = "//",
-            Type = AppType.Automatizador
-        },
-        new()
-        {
-            Name = "Planilha Portal Nacional",
-            Description = "Um appp doiiidimais doiiido",
-            DownloadPath = "//",
-            Type = AppType.Automatizador
-        }
     };
     public static List<PublishedApp> GetAvailableApps() => availableApps;
     public static PublishedApp? GetAppById(Guid Id)
