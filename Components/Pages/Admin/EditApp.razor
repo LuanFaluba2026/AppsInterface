@@ -1,0 +1,121 @@
+@page "/admin/apps/{AppId:guid}/edit"
+@using System.ComponentModel.DataAnnotations
+@using AppsInterface.Components.Models.Enum
+@using AppsInterface.Database
+@using System.Data.Common
+@using Microsoft.EntityFrameworkCore
+@layout AdminLayout
+@inject NavigationManager nav
+@inject IJSRuntime js
+@rendermode InteractiveServer
+
+@if(selectedApp == null)
+{
+    <div class="text-center py-5">
+        <h4>Carregando...</h4>
+    </div>
+}
+else
+{
+    <div class="d-flex flex-column align-items-start">
+        <h2>Editar Aplicativo</h2>
+
+        <div class="card w-100 mt-3">
+            <div class="card-body">
+                <h5 class="card-title">Formulário de Cadastro</h5>
+
+                <EditForm Model="selectedApp" OnValidSubmit="Salvar">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-3 d-flex justify-content-start gap-3">
+                    <div>
+                        <label class="form-label">Nome do Aplicativo</label>
+                        <InputText class="form-control" @bind-Value="selectedApp.Name" />
+                    </div>
+                    <div>
+                        <label class="form-label">Tipo</label>
+                        <InputSelect class="form-control" @bind-Value="selectedApp.Type">
+                            <option value="">Selecionar</option>
+                            <option value="@AppType.Automatizador">Automatizador</option>
+                            <option value="@AppType.Contabil">Contabil</option>
+                            <option value="@AppType.Fiscal">Fiscal</option>
+                        </InputSelect>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Descrição</label>
+                    <InputTextArea class="form-control" style="max-height: 400px; min-height: 200px" @bind-Value="selectedApp.Description" />
+                </div>
+
+                <div class="mb-3">
+                    <InputCheckbox @bind-Value="AtualizarArquivo" id="atualizarArquivo" class="ms-2"/>
+                    <label for="atualizarArquivo" class="form-label">Enviar Atualização</label>
+                    <div class="d-flex gap-3 align-items-center">
+                        <InputFile class="form-control" style="max-width: 400px;" OnChange="SelectFile" disabled="@(!AtualizarArquivo)"></InputFile>
+                        <InputText class="form-control" style="max-width: 200px;" @bind-Value="selectedApp.Version" disabled="@(!AtualizarArquivo)" placeholder="Versão (Ex: 1.0.1)"/>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Salvar</button>
+                <button type="button"
+                        class="btn btn-secondary ms-2"
+                        @onclick='() => nav.NavigateTo("/admin/apps")'>
+                    Voltar
+                </button>
+            </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+
+    [Inject]
+    private IDbContextFactory<AppDbContext> DbFactory { get; set; } = default!;
+    [Parameter]
+    public Guid AppId { get; set; }
+    //parameters set
+
+    private PublishedApp? selectedApp;
+    private bool AtualizarArquivo = false;
+    private IBrowserFile? uploadedFile;
+    private void SelectFile (InputFileChangeEventArgs e)
+    {
+        uploadedFile = e.File;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await using var Db = await DbFactory.CreateDbContextAsync();
+        selectedApp = await Db.PublishedApps.FindAsync(AppId);
+    }
+    private async Task Salvar()
+    {
+        await using var Db = await DbFactory.CreateDbContextAsync();
+        var app = await Db.PublishedApps.FindAsync(AppId);
+        if(app is null) return;
+        if(AtualizarArquivo && uploadedFile != null)
+        {
+            if(File.Exists(app.DownloadPath))
+                File.Delete(app.DownloadPath);
+                
+            var path = Path.Combine("wwwroot", "DownloadApps", uploadedFile.Name);
+            await using var stream = uploadedFile.OpenReadStream(500 * 1024 * 1024);
+            await using var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
+            await stream.CopyToAsync(fileStream);
+        }
+        app.Name = selectedApp.Name;
+        app.Description = selectedApp.Description;
+        app.Type = selectedApp.Type;
+        if(AtualizarArquivo && uploadedFile != null)
+        {
+            app.DownloadPath = Path.Combine("wwwroot", "DownloadApps", uploadedFile.Name);
+            app.Version = selectedApp.Version;
+        }
+
+        await Db.SaveChangesAsync();
+        await js.InvokeVoidAsync("alert", "Arquivo salvo com sucesso!");
+        nav.NavigateTo("/admin/apps");
+    }
+}

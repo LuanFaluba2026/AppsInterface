@@ -1,0 +1,66 @@
+@page "/admin/apps"
+@using AppsInterface.Database
+@using Microsoft.EntityFrameworkCore
+@layout AdminLayout
+@inject NavigationManager nav
+@rendermode InteractiveServer
+
+<div class="d-flex flex-column align-items-start">
+    <h2>Gerenciamento de Aplicativos</h2>
+    <div class="card w-100 mt-3">
+        <div class="card-body">
+            <h5 class="card-title">Aplicativos Disponíveis</h5>
+            <table class="table table-hover" style="table-layout: fixed;">
+                <thead>
+                    <tr>
+                        <th style="width: 20%">Nome</th>
+                        <th>Descrição</th>
+                        <th style="width: 20%;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="cursor-pointer">
+                    @foreach (var app in publishedApps)
+                    {
+                        <tr>
+                            <td>@app.Name</td>
+                            <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">@app.Description</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => ExcluirApp(app.Id)">Excluir</button>
+                                <button class="btn btn-sm btn-outline-warning" @onclick='() => nav.NavigateTo($"/admin/apps/{app.Id}/edit")'>Editar</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <button class="btn btn-outline-primary m-3 align-self-end" style="width: auto;" @onclick='() => { nav.NavigateTo("/admin/apps/new"); }'>Adicionar Novo</button>
+    </div>
+</div>
+
+@code
+{
+    [Inject]
+    private IDbContextFactory<AppDbContext> DbFactory { get; set; } = default!;
+    
+    List<PublishedApp> publishedApps = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await using var Db = await DbFactory.CreateDbContextAsync();
+        publishedApps = await Db.PublishedApps.ToListAsync();
+    }
+    async Task ExcluirApp(Guid appId)
+    {
+        await using var Db = await DbFactory.CreateDbContextAsync();
+        var app = await Db.PublishedApps.FindAsync(appId);
+        if (app is null) return;
+
+        Db.PublishedApps.Remove(app);
+        await Db.SaveChangesAsync();
+
+        if (File.Exists(app.DownloadPath))
+            File.Delete(app.DownloadPath);
+
+        publishedApps.Remove(app);
+        StateHasChanged();
+    }
+}

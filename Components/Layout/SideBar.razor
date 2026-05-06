@@ -1,14 +1,16 @@
-<div class="d-flex">
-    <aside class="vh-100 p-3 border-end" style="width: 300px;">
-        <h5>Bem-vindo(a), Usuário(a)</h5>
+@rendermode InteractiveServer
+@inject NavigationManager nav
 
+<div class="d-flex">
+    <aside class="vh-100 p-3 border-end" style="width: 380px;">
+        <h4>Bem-vindo(a), Usuário(a)</h4>
         <nav>
-            <ul class="nav flex-column">
+            <ul class="nav flex-column mt-4">
                 <li class="nav-item">
-                    <a class="nav-link text-dark" href="/">Home</a>
+                    <a class="nav-link fs-5 fw-semibold" href="#">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" href="/apps">Apps</a>
+                    <a class="nav-link fs-5 fw-semibold" href="/apps">Aplicativos</a>
                 </li>
             </ul>
         </nav>

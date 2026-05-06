@@ -1,0 +1,73 @@
+@page "/tickets/new"
+@using AppsInterface.Components.Models.Enum.Ticket
+@using AppsInterface.Database
+@using Microsoft.EntityFrameworkCore
+@rendermode InteractiveServer
+@inject NavigationManager nav
+
+@if(currentTicket is null)
+{
+    <div class="text-center py-5">
+        <h4>Carregando...</h4>
+    </div>
+}else
+{
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-primary text-white">
+            <h2 class="fw-bold mb-0">Abrir Novo Ticket</h2>
+        </div>
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">Formulário de Cadastro</h5>
+        <p class="card-text">Preencha os campos abaixo para criar um novo ticket.</p>
+
+        <EditForm Model="currentTicket" OnValidSubmit="Salvar">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="mb-3">
+                <label class="form-label">Título</label>
+                <InputText class="form-control" @bind-Value="currentTicket.Title" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Descrição</label>
+                <InputTextArea class="form-control"
+                            rows="6"
+                            @bind-Value="currentTicket.Description" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Prioridade</label>
+                <InputSelect class="form-control" @bind-Value="currentTicket.Priority">
+                    <option value="@TicketPriority.Baixa">Baixa</option>
+                    <option value="@TicketPriority.Media">Média</option>
+                    <option value="@TicketPriority.Alta">Alta</option>
+                </InputSelect>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Criar Ticket
+            </button>
+        </EditForm>
+    </div>
+}
+@code
+{
+    [Inject]
+    private IDbContextFactory<AppDbContext> DbFactory { get; set; } = default!;
+    [SupplyParameterFromQuery]
+    public Guid CurrentAppId { get; set; }
+
+    Ticket? currentTicket = new Ticket();
+
+    protected override void OnParametersSet()
+    {
+        currentTicket!.AppId = CurrentAppId;
+        currentTicket.AuthorId = Guid.NewGuid(); //SUBSTITUIR DEPOIS COM AUTENTICAÇÃO
+    }
+    private async Task Salvar()
+    {
+
+    }
+}

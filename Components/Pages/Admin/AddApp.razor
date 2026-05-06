@@ -1,0 +1,117 @@
+@page "/admin/apps/new"
+@using System.ComponentModel.DataAnnotations
+@using AppsInterface.Components.Models.Enum
+@using AppsInterface.Database
+@using System.Data.Common
+@using Microsoft.EntityFrameworkCore
+@layout AdminLayout
+@inject NavigationManager nav
+@inject IJSRuntime js
+@rendermode InteractiveServer
+
+<div class="d-flex flex-column align-items-start">
+    <h2>Adicionar Novo Aplicativo</h2>
+
+    <div class="card w-100 mt-3">
+        <div class="card-body">
+            <h5 class="card-title">Formulário de Cadastro</h5>
+
+            <EditForm Model="appModel" OnValidSubmit="Salvar">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="mb-3 d-flex justify-content-start gap-3">
+                <div>
+                    <label class="form-label">Nome do Aplicativo</label>
+                    <InputText class="form-control" @bind-Value="appModel.Nome" />
+                </div>
+                <div>
+                    <label class="form-label">Tipo</label>
+                    <InputSelect class="form-control" @bind-Value="appModel.Tipo">
+                        <option value="">Selecionar</option>
+                        <option value="@AppType.Automatizador">Automatizador</option>
+                        <option value="@AppType.Contabil">Contabil</option>
+                        <option value="@AppType.Fiscal">Fiscal</option>
+                    </InputSelect>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Descrição</label>
+                <InputTextArea class="form-control" style="max-height: 400px; min-height: 200px" @bind-Value="appModel.Descricao" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Arquivo</label>
+                <InputFile class="form-control" OnChange="SelectFile"></InputFile>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Salvar</button>
+            <button type="button"
+                    class="btn btn-secondary ms-2"
+                    @onclick='() => nav.NavigateTo("/admin/apps")'>
+                Voltar
+            </button>
+        </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Inject]
+    private IDbContextFactory<AppDbContext> DbFactory { get; set; } = default!;
+
+    private AppModel appModel = new();
+
+    public class AppModel
+    {
+        public Guid Id { get; private set; } = Guid.NewGuid();
+        [Required(ErrorMessage = "O nome é obrigatório")]
+        public string Nome { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "A descrição é obrigatória")]
+        public string Descricao { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Selecione um tipo de aplicativo")]
+        public AppType? Tipo { get; set; }
+    }
+    private IBrowserFile? uploadedFile;
+    private void SelectFile (InputFileChangeEventArgs e)
+    {
+        uploadedFile = e.File;
+    }
+    private async Task Salvar()
+    {
+        try
+        {
+            await using var Db = await DbFactory.CreateDbContextAsync();
+
+            if(uploadedFile == null)
+            {
+                await js.InvokeVoidAsync("alert", "Por favor, selecione um arquivo para upload.");
+                return;
+            }
+            var path = Path.Combine("wwwroot", "DownloadApps", uploadedFile.Name);
+            await using var stream = uploadedFile.OpenReadStream(500 * 1024 * 1024);
+            await using var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
+            await stream.CopyToAsync(fileStream);
+            PublishedApp app = new PublishedApp
+            {
+                Id = appModel.Id,
+                Name = appModel.Nome,
+                Description = appModel.Descricao,
+                Version = "1.0.0",
+                Type = appModel.Tipo ?? AppType.Automatizador,
+                DownloadPath = path
+            };
+            Db.PublishedApps.Add(app);
+            await Db.SaveChangesAsync();
+            await js.InvokeVoidAsync("alert", "Arquivo salvo com sucesso!");
+            nav.NavigateTo("/admin/apps");
+        }
+        catch (Exception ex)
+        {
+            await js.InvokeVoidAsync("alert", $"Erro ao salvar arquivo: {ex.Message}");
+        }
+    }
+}
