@@ -105,7 +105,7 @@ else
             await using var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
             await stream.CopyToAsync(fileStream);
         }
-        app.Name = selectedApp.Name;
+        app.Name = selectedApp!.Name;
         app.Description = selectedApp.Description;
         app.Type = selectedApp.Type;
         if(AtualizarArquivo && uploadedFile != null)
