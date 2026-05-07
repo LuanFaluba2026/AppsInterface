@@ -1,0 +1,48 @@
+@using AppsInterface.Components.Models.Enum.Ticket
+@using AppsInterface.Database
+@using Microsoft.EntityFrameworkCore
+@rendermode InteractiveServer
+@inject AppDbContext Db
+@inject NavigationManager nav
+
+@if(currentTicket is not null)
+{
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-primary text-white">
+            <h2 class="fw-bold mb-0">@currentTicket.Title</h2>
+        </div>
+        <div class="card-body">
+            <p><strong>Aplicativo:</strong> @ticketApp?.Name</p>
+            <p><strong>Prioridade:</strong> @currentTicket.Priority</p>
+            <p><strong>Status:</strong> @currentTicket.Status</p>
+            <hr />
+            <p>@currentTicket.Description</p>
+        </div>
+    </div>
+}
+
+@code {
+    [Inject]
+    private IDbContextFactory<AppDbContext> DbFactory { get; set; } = default!;
+    [Parameter]
+    public Guid? TicketId { get; set; }
+
+    public Ticket? currentTicket { get; set; }
+    private PublishedApp? ticketApp;
+    protected override async Task OnParametersSetAsync()
+    {
+        if (TicketId is null)
+            return;
+
+        using var db = DbFactory.CreateDbContext();
+
+        currentTicket = await db.Tickets
+            .FirstOrDefaultAsync(x => x.TicketId == TicketId);
+
+        if (currentTicket != null)
+        {
+            ticketApp = await db.PublishedApps
+                .FirstOrDefaultAsync(x => x.Id == currentTicket.AppId);
+        }
+    }
+}

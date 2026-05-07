@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AppsInterface.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260507022250_Init")]
+    [Migration("20260507133710_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -73,8 +73,9 @@ namespace AppsInterface.Migrations
                     b.Property<Guid>("AppId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("AuthorId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("AuthorEmail")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("timestamp with time zone");

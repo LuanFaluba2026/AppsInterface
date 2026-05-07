@@ -76,7 +76,7 @@
 
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <h4 class="fw-semibold mb-3">Tickets Abertos</h4>
-                        <button class="btn btn-primary" @onclick='() => nav.NavigateTo($"/tickets/new?appId={selectedApp.Id}")'>
+                        <button class="btn btn-primary" @onclick='() => nav.NavigateTo($"/tickets/{AppId}/newticket")'>
                             Abrir ticket
                         </button>
                 </div>
@@ -93,7 +93,7 @@
                         @for(int i = 0; i < appTickets.Count; i++)
                         {
                             var ticket = appTickets[i];
-                            <tr @onclick='() => nav.NavigateTo($"/tickets/{ticket.TicketId}")'>
+                            <tr @onclick="() => SelectTicket(ticket.TicketId)" class="@(currentTicket != null && ticket.TicketId == currentTicket.TicketId ? "table-primary" : "")">
                                 <td>@(i + 1)</td>
                                 <td>@ticket.Title</td>
                                 <td class="text-center align-middle">
@@ -106,6 +106,10 @@
                         }
                     </tbody>
                 </table>
+                @if (ShowTicket && currentTicket is not null)
+                {
+                    <TicketDisplay TicketId="@currentTicket.TicketId" />
+                }
             </div>
         </div>
     </div>
@@ -129,5 +133,16 @@
                 .OrderBy(x => (int)x.Priority)
                 .ToListAsync();
         }
+    }
+    bool ShowTicket;
+    private Ticket? currentTicket;
+    private void SelectTicket(Guid ticketId)
+    {
+        currentTicket = appTickets.FirstOrDefault(t => t.TicketId == ticketId);
+        ShowTicket = false;
+
+        StateHasChanged();
+
+        ShowTicket = true;
     }
 }

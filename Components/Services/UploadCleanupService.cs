@@ -18,6 +18,9 @@ public class UploadCleanupService : BackgroundService
         {
             using var scope = scopeFactory.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            //exclui todos os tickets que não pertencem à nenhum app ativo
+            await db.Tickets.Where(x => !db.PublishedApps.Any(z => z.Id == x.AppId)).ExecuteDeleteAsync();
+            //exclui os apps que nao foram uploadados.
             var uploadsIncompletos = await db.PublishedApps.Where(x => x.Status != DownloadStatus.Completed && x.CreatedAt < DateTime.UtcNow.AddMinutes(-30)).ToListAsync();
             foreach(var app in uploadsIncompletos)
             {

@@ -1,4 +1,4 @@
-@page "/tickets/new"
+@page "/tickets/{currentAppId:guid}/newticket"
 @using AppsInterface.Components.Models.Enum.Ticket
 @using AppsInterface.Database
 @using Microsoft.EntityFrameworkCore
@@ -8,7 +8,7 @@
 @if(currentTicket is null)
 {
     <div class="text-center py-5">
-        <h4>Carregando...</h4>
+        <h4>Carregando...</h4>s
     </div>
 }else
 {
@@ -17,7 +17,7 @@
             <h2 class="fw-bold mb-0">Abrir Novo Ticket</h2>
         </div>
     </div>
-    <div class="card-body">
+    <div class="card-body p-3">
         <h5 class="card-title">Formulário de Cadastro</h5>
         <p class="card-text">Preencha os campos abaixo para criar um novo ticket.</p>
 
@@ -28,6 +28,10 @@
             <div class="mb-3">
                 <label class="form-label">Título</label>
                 <InputText class="form-control" @bind-Value="currentTicket.Title" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">E-mail</label>
+                <InputText class="form-control" @bind-Value="currentTicket.AuthorEmail" />
             </div>
 
             <div class="mb-3">
@@ -56,7 +60,7 @@
 {
     [Inject]
     private IDbContextFactory<AppDbContext> DbFactory { get; set; } = default!;
-    [SupplyParameterFromQuery]
+    [Parameter]
     public Guid CurrentAppId { get; set; }
 
     Ticket? currentTicket = new Ticket();
@@ -64,10 +68,15 @@
     protected override void OnParametersSet()
     {
         currentTicket!.AppId = CurrentAppId;
-        currentTicket.AuthorId = Guid.NewGuid(); //SUBSTITUIR DEPOIS COM AUTENTICAÇÃO
+        currentTicket.CreationTime = DateTime.UtcNow;
     }
     private async Task Salvar()
     {
-
+        if(currentTicket is null || String.IsNullOrEmpty(currentTicket.Title) || String.IsNullOrEmpty(currentTicket.Description))
+            return;
+        using var db = DbFactory.CreateDbContext();
+        db.Tickets.Add(currentTicket);
+        await db.SaveChangesAsync();
+        nav.NavigateTo($"/apps/{CurrentAppId}");
     }
 }

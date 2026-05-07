@@ -36,7 +36,7 @@ namespace AppsInterface.Migrations
                 {
                     TicketId = table.Column<Guid>(type: "uuid", nullable: false),
                     AppId = table.Column<Guid>(type: "uuid", nullable: false),
-                    AuthorId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AuthorEmail = table.Column<string>(type: "text", nullable: false),
                     CreationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Title = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),

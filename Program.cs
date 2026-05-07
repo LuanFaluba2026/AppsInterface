@@ -1,6 +1,7 @@
 using AppsInterface.Components;
 using AppsInterface.Components.Services;
 using AppsInterface.Database;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,4 +32,5 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
 app.Run();
