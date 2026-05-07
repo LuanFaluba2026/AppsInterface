@@ -1,4 +1,5 @@
 using AppsInterface.Components;
+using AppsInterface.Components.Services;
 using AppsInterface.Database;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +11,8 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddDbContextFactory<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddHostedService<UploadCleanupService>();
 
 var app = builder.Build();
 

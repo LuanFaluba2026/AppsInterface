@@ -54,13 +54,13 @@
         var app = await Db.PublishedApps.FindAsync(appId);
         if (app is null) return;
 
-        Db.PublishedApps.Remove(app);
-        await Db.SaveChangesAsync();
-
         if (File.Exists(app.DownloadPath))
             File.Delete(app.DownloadPath);
 
-        publishedApps.Remove(app);
+        Db.PublishedApps.Remove(app);
+        await Db.SaveChangesAsync();
+
+        publishedApps.RemoveAll(x => x.Id == appId);
         StateHasChanged();
     }
 }

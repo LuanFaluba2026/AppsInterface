@@ -11,10 +11,10 @@
         <div class="d-flex flex-wrap gap-3 align-items-center mb-4">
             <div class="flex-grow-1">
                 <input type="text"
-                       @bind="searchTerm"
-                       @bind:event="oninput"
-                       class="form-control"
-                       placeholder="Pesquisar apps..." />
+                    @bind="searchTerm"
+                    @bind:event="oninput"
+                    class="form-control"
+                    placeholder="Pesquisar apps..." />
             </div>
 
             <div style="min-width: 220px;">
@@ -71,7 +71,7 @@
     protected override async Task OnInitializedAsync()
     {
         await using var Db = await DbFactory.CreateDbContextAsync();
-        availableApps = await Db.PublishedApps.ToListAsync();
+        availableApps = await Db.PublishedApps.Where(x => x.Status == DownloadStatus.Completed).ToListAsync();
         currentApps = availableApps;
     }
 
