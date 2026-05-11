@@ -1,0 +1,161 @@
+@page "/admin/users"
+@attribute [Authorize(Roles = "Admin")]
+@layout AdminLayout
+@inject NavigationManager nav
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject PasswordService passwordService
+@rendermode InteractiveServer
+
+<div class="d-flex flex-column align-items-start">
+    <h2>Gerenciamento de Usuários</h2>
+    <div class="card w-100 mt 3">
+        <div class="card-body">
+            <header class="d-flex justify-content-between">
+                <h5 class="card-title">Usuários Cadastrados</h5>
+                <button class="btn btn-primary" @onclick="ShowModal">Adicionar Usuário</button>
+            </header>
+            <table class="table table-hover" style="table-layout: fixed;">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Usuário</th>
+                        <th style="width: 20%;">Administrador</th>
+                        <th style="width: 20%;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="cursor-pointer">
+                    @foreach (var user in users)
+                    {
+                        <tr>
+                            <td>@user.Nome</td>
+                            <td>@user.Login</td>
+                            <td>@(user.IsAdmin ? "Sim" : "Não")</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => ExcluirUsuario(user.Id)">Excluir</button>
+                                <button class="btn btn-sm btn-outline-warning" @onclick='() => nav.NavigateTo($"/admin/users/{user.Id}/edit")'>Editar</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@if(showModal)
+{
+    <div class="modal-backdrop fade show"></div>
+    <div class="modal d-block" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 shadow-lg">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cadastrar Usuário</h5>
+                    <button class="btn-close" @onclick="HideModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nome</label>
+                        <input @bind="nome" class="form-control"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Login</label>
+                        <input @bind="login" class="form-control"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Senha</label>
+                        <input @bind="senha" type="password" class="form-control"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Administrador</label>
+                        <input @bind="isAdmin" type="checkbox" class="form-check-input"/>
+                    </div>
+                    @if(!string.IsNullOrEmpty(erro))
+                    {
+                        <div class="alert alert-danger">@erro</div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="HideModal">Cancelar</button>
+                    <button class="btn btn-success" @onclick="CadastrarUsuario">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code
+{
+    bool showModal = false;
+
+    string? nome;
+    string? login;
+    string? senha;
+    bool isAdmin;
+    string? erro;
+    List<User> users = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await using var Db = await DbFactory.CreateDbContextAsync();
+        users = await Db.Users.ToListAsync();
+    }
+    async Task CadastrarUsuario()
+    {
+        erro = null;
+
+        if (string.IsNullOrWhiteSpace(nome) ||
+            string.IsNullOrWhiteSpace(login) ||
+            string.IsNullOrWhiteSpace(senha))
+        {
+            erro = "Preencha todos os campos.";
+            return;
+        }
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        bool loginExiste = await db.Users
+            .AnyAsync(u => u.Login == login);
+
+        if (loginExiste)
+        {
+            erro = "Já existe um usuário com esse login.";
+            return;
+        }
+
+        var newUser = new User
+        {
+            Nome = nome.Trim(),
+            Login = login.Trim(),
+            IsAdmin = isAdmin
+        };
+
+        newUser.PasswordHash = passwordService.Hash(newUser, senha);
+
+        db.Users.Add(newUser);
+        await db.SaveChangesAsync();
+
+        users.Add(newUser);
+
+        HideModal();
+        nome = login = senha = null;
+        isAdmin = false;
+    }
+    void ShowModal()
+    {
+        showModal = true;
+    }
+    void HideModal()
+    {
+        showModal = false;
+    }
+    async Task ExcluirUsuario(Guid userId)
+    {
+        await using var Db = await DbFactory.CreateDbContextAsync();
+        var user = await Db.Users.FindAsync(userId);
+        if (user is null) return;
+
+        Db.Users.Remove(user);
+        users.RemoveAll(x => x.Id == userId);
+        StateHasChanged();
+        await Db.SaveChangesAsync();
+    }
+}

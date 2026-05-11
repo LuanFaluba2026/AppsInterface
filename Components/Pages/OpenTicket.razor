@@ -1,7 +1,5 @@
 @page "/tickets/{currentAppId:guid}/newticket"
-@using AppsInterface.Components.Models.Enum.Ticket
-@using AppsInterface.Database
-@using Microsoft.EntityFrameworkCore
+@attribute [Authorize]
 @rendermode InteractiveServer
 @inject NavigationManager nav
 

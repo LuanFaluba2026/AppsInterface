@@ -1,10 +1,5 @@
 @page "/admin/apps/new"
-@using System.ComponentModel.DataAnnotations
-@using AppsInterface.Components.Models.Enum
-@using AppsInterface.Components.Pages.Helpers
-@using AppsInterface.Database
-@using System.Data.Common
-@using Microsoft.EntityFrameworkCore
+@attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
 @inject NavigationManager nav
 @inject IJSRuntime js

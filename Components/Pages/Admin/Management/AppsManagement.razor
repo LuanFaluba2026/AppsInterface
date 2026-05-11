@@ -1,6 +1,5 @@
 @page "/admin/apps"
-@using AppsInterface.Database
-@using Microsoft.EntityFrameworkCore
+@attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
 @inject NavigationManager nav
 @rendermode InteractiveServer

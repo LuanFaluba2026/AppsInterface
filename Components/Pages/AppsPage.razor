@@ -1,5 +1,6 @@
 ﻿@page "/apps"
 @page "/apps/{AppId:guid}"
+@attribute [Authorize]
 
 <AppsList />
 @if (AppId.HasValue)

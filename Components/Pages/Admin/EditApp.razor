@@ -1,9 +1,5 @@
 @page "/admin/apps/{AppId:guid}/edit"
-@using System.ComponentModel.DataAnnotations
-@using AppsInterface.Components.Models.Enum
-@using AppsInterface.Database
-@using System.Data.Common
-@using Microsoft.EntityFrameworkCore
+@attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
 @inject NavigationManager nav
 @inject IJSRuntime js
