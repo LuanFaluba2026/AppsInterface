@@ -84,26 +84,38 @@
                     <thead>
                         <tr>
                             <th style="width: 8%;">Índice</th>
-                            <th style="width: 70%;">Descrição</th>
+                            <th style="width: 70%;">Título</th>
                             <th class="text-center" style="width: 20%;">Prioridade</th>
                             <th style="width: 20%;">Status</th>
                         </tr>
                     </thead>
                     <tbody class="cursor-pointer">
-                        @for(int i = 0; i < appTickets.Count; i++)
+                        @if(appTickets.Count == 0)
                         {
-                            var ticket = appTickets[i];
-                            <tr @onclick="() => SelectTicket(ticket.TicketId)" class="@(currentTicket != null && ticket.TicketId == currentTicket.TicketId ? "table-primary" : "")">
-                                <td>@(i + 1)</td>
-                                <td>@ticket.Title</td>
-                                <td class="text-center align-middle">
-                                    <span class="@(ticket.Priority == TicketPriority.Alta ? "bg-danger text-white" : ticket.Priority == TicketPriority.Media ? "bg-warning text-dark" : "bg-success text-white") p-1 px-4 rounded-pill">
-                                        @ticket.Priority
-                                    </span>
-                                </td>                                
-                                <td class="@(ticket.Status == TicketStatus.Aberto ? "text-warning" : "text-success")">@ticket.Status</td>
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    Nenhum ticket aberto para este aplicativo.
+                                </td>
                             </tr>
                         }
+                        else
+                        {
+                            for(int i = 0; i < appTickets.Count; i++)
+                            {
+                                var ticket = appTickets[i];
+                                <tr @onclick="() => SelectTicket(ticket.TicketId)" class="@(currentTicket != null && ticket.TicketId == currentTicket.TicketId ? "table-primary" : "")">
+                                    <td>@(i + 1)</td>
+                                    <td>@ticket.Title</td>
+                                    <td class="text-center align-middle">
+                                        <span class="@(ticket.Priority == TicketPriority.Alta ? "bg-danger text-white" : ticket.Priority == TicketPriority.Media ? "bg-warning text-dark" : "bg-success text-white") p-1 px-4 rounded-pill">
+                                            @ticket.Priority
+                                        </span>
+                                    </td>                                
+                                    <td class="@(ticket.Status == TicketStatus.Aberto ? "text-warning" : "text-success")">@ticket.Status</td>
+                                </tr>
+                            }
+                        }
+                        
                     </tbody>
                 </table>
                 @if (ShowTicket && currentTicket is not null)

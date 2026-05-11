@@ -10,6 +10,7 @@ public class Ticket
     [EmailAddress]
     public string AuthorEmail { get; set; } = "";
     public DateTime CreationTime { get; set; } = DateTime.Now;
+    public string? AttachmentPath { get; set; } 
     public string Title { get; set; } = "";
     public string Description { get; set;} = "";
     public TicketPriority Priority {get; set;}

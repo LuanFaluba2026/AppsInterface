@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AppsInterface.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260507133710_Init")]
-    partial class Init
+    [Migration("20260511133605_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -40,9 +40,6 @@ namespace AppsInterface.Migrations
 
                     b.Property<string>("DownloadPath")
                         .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("IconPath")
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
@@ -72,6 +69,9 @@ namespace AppsInterface.Migrations
 
                     b.Property<Guid>("AppId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("AttachmentPath")
+                        .HasColumnType("text");
 
                     b.Property<string>("AuthorEmail")
                         .IsRequired()

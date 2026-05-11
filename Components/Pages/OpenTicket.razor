@@ -42,6 +42,11 @@
             </div>
 
             <div class="mb-3">
+                <label for="anexo" class="form-label">Anexo de Imagens</label>
+                <InputFile class="form-control" accept="image/png, image/jpeg" multiple OnChange="SelectFiles"></InputFile>
+            </div>
+
+            <div class="mb-3">
                 <label class="form-label">Prioridade</label>
                 <InputSelect class="form-control" @bind-Value="currentTicket.Priority">
                     <option value="@TicketPriority.Baixa">Baixa</option>
@@ -65,6 +70,12 @@
 
     Ticket? currentTicket = new Ticket();
 
+    private IBrowserFile[]? selectedFiles;
+    private void SelectFiles(InputFileChangeEventArgs e)
+    {
+        selectedFiles = e.GetMultipleFiles(10).ToArray();
+    }
+
     protected override void OnParametersSet()
     {
         currentTicket!.AppId = CurrentAppId;
@@ -75,6 +86,17 @@
         if(currentTicket is null || String.IsNullOrEmpty(currentTicket.Title) || String.IsNullOrEmpty(currentTicket.Description))
             return;
         using var db = DbFactory.CreateDbContext();
+
+        var filesPath = Path.Combine("wwwroot", "Tickets", currentTicket.TicketId.ToString());
+        foreach(var file in selectedFiles ?? Array.Empty<IBrowserFile>())
+        {
+            var filePath = Path.Combine(filesPath, file.Name);
+             Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+             using var stream = new FileStream(filePath, FileMode.Create);
+             await file.OpenReadStream().CopyToAsync(stream);
+        }
+        currentTicket.AttachmentPath = selectedFiles != null && selectedFiles.Length > 0 ? filesPath : null;
+
         db.Tickets.Add(currentTicket);
         await db.SaveChangesAsync();
         nav.NavigateTo($"/apps/{CurrentAppId}");

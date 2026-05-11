@@ -39,9 +39,6 @@ namespace AppsInterface.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("IconPath")
-                        .HasColumnType("text");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -69,6 +66,9 @@ namespace AppsInterface.Migrations
 
                     b.Property<Guid>("AppId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("AttachmentPath")
+                        .HasColumnType("text");
 
                     b.Property<string>("AuthorEmail")
                         .IsRequired()
