@@ -48,6 +48,29 @@ app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();
+    var passwordService = scope.ServiceProvider.GetRequiredService<PasswordService>();
+
+    await using var db = await dbFactory.CreateDbContextAsync();
+
+    if (!await db.Users.AnyAsync(u => u.IsAdmin))
+    {
+        var admin = new AppsInterface.Components.Models.User
+        {
+            Nome = "Administrador",
+            Login = "admin",
+            IsAdmin = true
+        };
+
+        admin.PasswordHash = passwordService.Hash(admin, "cgcadministrator30364400");
+
+        db.Users.Add(admin);
+        await db.SaveChangesAsync();
+    }
+}
+
 app.MapPost("/auth/login", async (HttpContext context, IDbContextFactory<AppDbContext> dbFactory, PasswordService passwordService) =>
 {
     var form = await context.Request.ReadFormAsync();
@@ -69,6 +92,11 @@ app.MapPost("/auth/login", async (HttpContext context, IDbContextFactory<AppDbCo
     var principal = new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
     await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
     return Results.Redirect("/");
+});
+app.MapPost("/auth/logout", async (HttpContext context) =>
+{
+    await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    return Results.Redirect("/login");
 });
 
 app.Run();
