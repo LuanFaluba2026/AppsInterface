@@ -32,7 +32,7 @@
                             <td>@(user.IsAdmin ? "Sim" : "Não")</td>
                             <td>
                                 <button class="btn btn-sm btn-outline-danger" @onclick="() => ExcluirUsuario(user.Id)">Excluir</button>
-                                <button class="btn btn-sm btn-outline-warning" @onclick='() => nav.NavigateTo($"/admin/users/{user.Id}/edit")'>Editar</button>
+                                <button class="btn btn-sm btn-outline-warning" @onclick='() => EditarUsuario(user.Id)'>Editar</button>
                             </td>
                         </tr>
                     }
@@ -59,7 +59,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Login</label>
-                        <input @bind="login" class="form-control"/>
+                        <input @bind="login" class="form-control" disabled="@isEditMode"/>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Senha</label>
@@ -76,7 +76,7 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" @onclick="HideModal">Cancelar</button>
-                    <button class="btn btn-success" @onclick="CadastrarUsuario">Salvar</button>
+                    <button class="btn btn-success" @onclick="SalvarUsuario">Salvar</button>
                 </div>
             </div>
         </div>
@@ -86,6 +86,7 @@
 @code
 {
     bool showModal = false;
+    bool isEditMode = false;
 
     string? nome;
     string? login;
@@ -98,9 +99,57 @@
         await using var Db = await DbFactory.CreateDbContextAsync();
         users = await Db.Users.ToListAsync();
     }
-    async Task CadastrarUsuario()
+    async Task SalvarUsuario()
     {
         erro = null;
+
+        
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        bool loginExiste = await db.Users
+            .AnyAsync(u => u.Login == login);
+
+        if (loginExiste && isEditMode)
+        {
+            var usuarioExistente = await db.Users.FirstOrDefaultAsync(u => u.Login == login);
+
+            if (usuarioExistente is null)
+            {
+                erro = "Usuário não encontrado para edição.";
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(nome) ||
+            string.IsNullOrWhiteSpace(login))
+            {
+                erro = "Preencha todos os campos.";
+                return;
+            }
+            var editUser = new User
+            {
+                Nome = nome.Trim(),
+                Login = login.Trim(),
+                IsAdmin = isAdmin
+            };
+            var lastPasswordHash = usuarioExistente.PasswordHash;
+            editUser.PasswordHash = senha == null ? lastPasswordHash : passwordService.Hash(editUser, senha);
+            db.Users.Remove(usuarioExistente);
+            db.Users.Add(editUser);
+            await db.SaveChangesAsync();
+
+            isEditMode = false;
+            users.RemoveAll(x => x.Id == usuarioExistente.Id);
+            users.Add(editUser);
+            StateHasChanged();
+            HideModal();
+            nome = login = senha = null;
+            return;
+        }
+        else if (loginExiste)
+        {
+            erro = "Já existe um usuário com esse login.";
+            return;
+        }
 
         if (string.IsNullOrWhiteSpace(nome) ||
             string.IsNullOrWhiteSpace(login) ||
@@ -109,18 +158,6 @@
             erro = "Preencha todos os campos.";
             return;
         }
-
-        await using var db = await DbFactory.CreateDbContextAsync();
-
-        bool loginExiste = await db.Users
-            .AnyAsync(u => u.Login == login);
-
-        if (loginExiste)
-        {
-            erro = "Já existe um usuário com esse login.";
-            return;
-        }
-
         var newUser = new User
         {
             Nome = nome.Trim(),
@@ -139,13 +176,16 @@
         nome = login = senha = null;
         isAdmin = false;
     }
-    void ShowModal()
+    async Task EditarUsuario(Guid userId)
     {
+        isEditMode = true;
+        await using var Db = await DbFactory.CreateDbContextAsync();
+        var user = await Db.Users.FindAsync(userId);
+        if (user is null) return;
+        nome = user.Nome;
+        login = user.Login;
+        isAdmin = user.IsAdmin;
         showModal = true;
-    }
-    void HideModal()
-    {
-        showModal = false;
     }
     async Task ExcluirUsuario(Guid userId)
     {
@@ -157,5 +197,13 @@
         users.RemoveAll(x => x.Id == userId);
         StateHasChanged();
         await Db.SaveChangesAsync();
+    }
+    void ShowModal()
+    {
+        showModal = true;
+    }
+    void HideModal()
+    {
+        showModal = false;
     }
 }
